@@ -1,2 +1,2 @@
 # go-examples
-Examples for Golang
+Examples for Golang. It's just a sandbox, without any guarantee!
