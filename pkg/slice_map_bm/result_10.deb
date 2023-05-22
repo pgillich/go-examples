@@ -1,0 +1,78 @@
+# testing
+gc 1 @0.193s 0%: 0.032+5.5+0.18 ms clock, 0.26+0.094/10/9.9+1.4 ms cpu, 61->61->20 MB, 64 MB goal, 0 MB stacks, 0 MB globals, 8 P
+# github.com/pgillich/go-examples/pkg/slice_map_bm [github.com/pgillich/go-examples/pkg/slice_map_bm.test]
+./bm.go:18:15: make([]Data, 0) escapes to heap
+./bm.go:27:15: make([]Data, 0, n) escapes to heap
+./bm.go:35:15: leaking param: items to result ~r0 level=1
+./bm.go:39:16: items does not escape
+./bm.go:39:30: seek does not escape
+./bm.go:50:15: make(map[string]Data) escapes to heap
+./bm.go:59:15: make(map[string]Data, n) escapes to heap
+./bm.go:67:13: items does not escape
+./bm.go:71:14: items does not escape
+./bm.go:71:37: seek does not escape
+./bm_test.go:35:28: b does not escape
+./bm_test.go:24:28: leaking param: b
+./bm_test.go:26:44: b does not escape
+./bm_test.go:25:9: moved to heap: size
+./bm_test.go:26:20: ... argument does not escape
+./bm_test.go:26:32: size escapes to heap
+./bm_test.go:26:39: func literal escapes to heap
+./bm_test.go:51:28: b does not escape
+./bm_test.go:40:28: leaking param: b
+./bm_test.go:42:44: b does not escape
+./bm_test.go:41:9: moved to heap: size
+./bm_test.go:42:20: ... argument does not escape
+./bm_test.go:42:32: size escapes to heap
+./bm_test.go:42:39: func literal escapes to heap
+./bm_test.go:70:28: b does not escape
+./bm_test.go:56:28: leaking param: b
+./bm_test.go:61:44: b does not escape
+./bm_test.go:57:9: moved to heap: size
+./bm_test.go:61:20: ... argument does not escape
+./bm_test.go:61:32: size escapes to heap
+./bm_test.go:61:39: func literal escapes to heap
+./bm_test.go:93:28: b does not escape
+./bm_test.go:79:28: leaking param: b
+./bm_test.go:84:44: b does not escape
+./bm_test.go:80:9: moved to heap: size
+./bm_test.go:84:20: ... argument does not escape
+./bm_test.go:84:32: size escapes to heap
+./bm_test.go:84:39: func literal escapes to heap
+./bm_test.go:113:27: b does not escape
+./bm_test.go:102:26: leaking param: b
+./bm_test.go:104:44: b does not escape
+./bm_test.go:103:9: moved to heap: size
+./bm_test.go:104:20: ... argument does not escape
+./bm_test.go:104:32: size escapes to heap
+./bm_test.go:104:39: func literal escapes to heap
+./bm_test.go:129:26: b does not escape
+./bm_test.go:118:26: leaking param: b
+./bm_test.go:120:44: b does not escape
+./bm_test.go:119:9: moved to heap: size
+./bm_test.go:120:20: ... argument does not escape
+./bm_test.go:120:32: size escapes to heap
+./bm_test.go:120:39: func literal escapes to heap
+./bm_test.go:145:26: b does not escape
+./bm_test.go:134:26: leaking param: b
+./bm_test.go:136:44: b does not escape
+./bm_test.go:135:9: moved to heap: size
+./bm_test.go:136:20: ... argument does not escape
+./bm_test.go:136:32: size escapes to heap
+./bm_test.go:136:39: func literal escapes to heap
+./bm_test.go:165:26: b does not escape
+./bm_test.go:154:26: leaking param: b
+./bm_test.go:156:44: b does not escape
+./bm_test.go:155:9: moved to heap: size
+./bm_test.go:156:20: ... argument does not escape
+./bm_test.go:156:32: size escapes to heap
+./bm_test.go:156:39: func literal escapes to heap
+./bm_test.go:187:18: make([]byte, n) escapes to heap
+./bm_test.go:192:16: string(bytes) escapes to heap
+./bm_test.go:182:12: ... argument does not escape
+./bm_test.go:182:28: testSizes escapes to heap
+./bm_test.go:190:22: index bounds check elided
+# internal/fuzz
+gc 1 @0.170s 0%: 0.059+5.6+0.18 ms clock, 0.47+0.17/9.7/11+1.4 ms cpu, 61->61->19 MB, 64 MB goal, 0 MB stacks, 0 MB globals, 8 P
+# github.com/pgillich/go-examples/pkg/slice_map_bm.test
+_testmain.go:59:42: testdeps.TestDeps{} escapes to heap
