@@ -32,10 +32,6 @@ func sliceFillFix(n int) []Data {
 	return items
 }
 
-func sliceUse(items []Data) string {
-	return items[0].str
-}
-
 func sliceSeek(items []Data, seek string) int {
 	for i, item := range items {
 		if seek == item.str {
@@ -62,10 +58,6 @@ func mapFillFix(n int) map[string]Data {
 	}
 
 	return items
-}
-
-func mapUse(items map[string]Data) Data {
-	return items[allStrings[0]]
 }
 
 func mapSeek(items map[string]Data, seek string) (Data, bool) {

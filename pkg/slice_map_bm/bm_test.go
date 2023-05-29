@@ -6,6 +6,7 @@ import (
 	mrand "math/rand"
 	"runtime"
 	"testing"
+	"time"
 )
 
 const (
@@ -13,161 +14,117 @@ const (
 	strLenMax = 50
 
 	sliceSeekLimit = 20000
-
-	doGC = true
 )
 
 var (
 	testSizes []int
+
+	sliceItems []Data
+	mapItems   map[string]Data
 )
 
-func BenchmarkSliceDynFill(b *testing.B) {
+func BenchmarkSliceDyn(b *testing.B) {
 	for _, size := range testSizes {
 		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			benchmarkSliceDynFill(b, size)
-			if doGC {
+			start := time.Now()
+			sliceItems = sliceFillDyn(size)
+			reportExtraTime(b, start, "fill_sec/op")
+
+			defer func() {
+				start = time.Now()
+				sliceItems = nil
 				runtime.GC()
+				reportExtraTime(b, start, "gc_sec/op")
+			}()
+
+			if size > sliceSeekLimit {
+				return
 			}
+
+			start = time.Now()
+			for s := 0; s < size; s++ {
+				i := sliceSeek(sliceItems, allStrings[s])
+				_ = i
+			}
+			reportExtraTime(b, start, "seek_sec/op")
 		})
 	}
 }
 
-func benchmarkSliceDynFill(b *testing.B, size int) {
-	items := sliceFillDyn(size)
-	_ = sliceUse(items)
-}
-
-func BenchmarkSliceFixFill(b *testing.B) {
+func BenchmarkSliceFix(b *testing.B) {
 	for _, size := range testSizes {
 		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			benchmarkSliceFixFill(b, size)
-			if doGC {
+			start := time.Now()
+			sliceItems = sliceFillFix(size)
+			reportExtraTime(b, start, "fill_sec/op")
+
+			defer func() {
+				start = time.Now()
+				sliceItems = nil
 				runtime.GC()
+				reportExtraTime(b, start, "gc_sec/op")
+			}()
+
+			if size > sliceSeekLimit {
+				return
 			}
+
+			start = time.Now()
+			for s := 0; s < size; s++ {
+				i := sliceSeek(sliceItems, allStrings[s])
+				_ = i
+			}
+			reportExtraTime(b, start, "seek_sec/op")
+
+			start = time.Now()
+			sliceItems = nil
+			runtime.GC()
+			reportExtraTime(b, start, "gc_sec/op")
 		})
 	}
 }
 
-func benchmarkSliceFixFill(b *testing.B, size int) {
-	items := sliceFillFix(size)
-	_ = sliceUse(items)
-}
-
-func BenchmarkSliceDynSeek(b *testing.B) {
+func BenchmarkMapDyn(b *testing.B) {
 	for _, size := range testSizes {
-		if size > sliceSeekLimit {
-			continue
-		}
 		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			benchmarkSliceDynSeek(b, size)
-			if doGC {
-				runtime.GC()
+			start := time.Now()
+			mapItems = mapFillDyn(size)
+			reportExtraTime(b, start, "fill_sec/op")
+
+			start = time.Now()
+			for s := 0; s < size; s++ {
+				data, _ := mapSeek(mapItems, allStrings[s])
+				_ = data
 			}
+			reportExtraTime(b, start, "seek_sec/op")
+
+			start = time.Now()
+			mapItems = nil
+			runtime.GC()
+			reportExtraTime(b, start, "gc_sec/op")
 		})
 	}
 }
 
-func benchmarkSliceDynSeek(b *testing.B, size int) {
-	b.StopTimer()
-	items := sliceFillDyn(size)
-	b.StartTimer()
-	for s := 0; s < size; s++ {
-		_ = sliceSeek(items, allStrings[s])
-	}
-}
-
-func BenchmarkSliceFixSeek(b *testing.B) {
-	for _, size := range testSizes {
-		if size > sliceSeekLimit {
-			continue
-		}
-		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			benchmarkSliceFixSeek(b, size)
-			if doGC {
-				runtime.GC()
-			}
-		})
-	}
-}
-
-func benchmarkSliceFixSeek(b *testing.B, size int) {
-	b.StopTimer()
-	items := sliceFillFix(size)
-	b.StartTimer()
-	for s := 0; s < size; s++ {
-		_ = sliceSeek(items, allStrings[s])
-	}
-}
-
-func BenchmarkMapDynFill(b *testing.B) {
+func BenchmarkMapFix(b *testing.B) {
 	for _, size := range testSizes {
 		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			bBenchmarkMapDynFill(b, size)
-			if doGC {
-				runtime.GC()
+			start := time.Now()
+			mapItems = mapFillFix(size)
+			reportExtraTime(b, start, "fill_sec/op")
+
+			start = time.Now()
+			for s := 0; s < size; s++ {
+				data, _ := mapSeek(mapItems, allStrings[s])
+				_ = data
 			}
+			reportExtraTime(b, start, "seek_sec/op")
+
+			start = time.Now()
+			mapItems = nil
+			runtime.GC()
+			reportExtraTime(b, start, "gc_sec/op")
 		})
-	}
-}
-
-func bBenchmarkMapDynFill(b *testing.B, size int) {
-	items := mapFillDyn(size)
-	_ = mapUse(items)
-}
-
-func BenchmarkMapFixFill(b *testing.B) {
-	for _, size := range testSizes {
-		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			benchmarkMapFixFill(b, size)
-			if doGC {
-				runtime.GC()
-			}
-		})
-	}
-}
-
-func benchmarkMapFixFill(b *testing.B, size int) {
-	items := mapFillFix(size)
-	_ = mapUse(items)
-}
-
-func BenchmarkMapDynSeek(b *testing.B) {
-	for _, size := range testSizes {
-		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			benchmarkMapDynSeek(b, size)
-			if doGC {
-				runtime.GC()
-			}
-		})
-	}
-}
-
-func benchmarkMapDynSeek(b *testing.B, size int) {
-	b.StopTimer()
-	items := mapFillDyn(size)
-	b.StartTimer()
-	for s := 0; s < size; s++ {
-		_, _ = mapSeek(items, allStrings[s])
-	}
-}
-
-func BenchmarkMapFixSeek(b *testing.B) {
-	for _, size := range testSizes {
-		b.Run(fmt.Sprintf("size=%d", size), func(b *testing.B) {
-			benchmarkMapFixSeek(b, size)
-			if doGC {
-				runtime.GC()
-			}
-		})
-	}
-}
-
-func benchmarkMapFixSeek(b *testing.B, size int) {
-	b.StopTimer()
-	items := mapFillFix(size)
-	b.StartTimer()
-	for s := 0; s < size; s++ {
-		_, _ = mapSeek(items, allStrings[s])
 	}
 }
 
@@ -190,4 +147,8 @@ func randomText(n int) string {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
 	}
 	return string(bytes)
+}
+
+func reportExtraTime(b *testing.B, start time.Time, metric string) {
+	b.ReportMetric(float64(time.Since(start).Nanoseconds())/float64(b.N), metric)
 }
