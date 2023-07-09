@@ -62,6 +62,8 @@ linters:
     - ireturn
     - stylecheck
     - gomnd
+    - revive
+    - depguard
 issues:
   exclude-use-default: false
   exclude-rules:
